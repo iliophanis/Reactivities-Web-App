@@ -23,7 +23,8 @@ namespace API
                 var services=scope.ServiceProvider;
                 try{
                         var context =services.GetRequiredService<DataContext>();
-                        context.Database.Migrate();//use to create a database base on migration every time run api project
+                        context.Database.Migrate();
+                        Seed.SeedData(context);
                 }
                 catch(Exception ex){
                     var logger=services.GetRequiredService<ILogger<Program>>();
