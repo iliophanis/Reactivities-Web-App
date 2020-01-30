@@ -1,9 +1,9 @@
-export interface IActivity{ //use to make strict and for type checking
-    //like propTypes
+export interface IActivity{
+    category: any; //use to make strict and for type checking
     id:string;
     title:string;
     description:string;
-    date:Date;
+    date:string;
     city:string;
     venue:string;
 }
