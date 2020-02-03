@@ -81,7 +81,7 @@ const ActivityForm: React.FC<IProps> = ({
         <Form.Input
           onChange={handleInputChange}
           name="date"
-          type="datetime-local"//in different case dont show the date
+          type="date"//in different case dont show the date PROBLEM WITH DATE type=datetime-local
           placeholder="Date"
           value={activity.date}
         />

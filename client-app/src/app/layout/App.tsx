@@ -1,9 +1,9 @@
 import React,{useState,useEffect,Fragment} from 'react';
-import axios from 'axios';
 import { Container} from 'semantic-ui-react';
 import { IActivity } from '../models/activity';
 import NavBar from '../../features/navbar/NavBar';
 import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
+import agent from '../api/agent';
 
 interface Istate{
   activities:IActivity[]//type of an array of iactivity
@@ -25,29 +25,38 @@ const App =()=> {
 
 const handleCreateActivity=(activity: IActivity)=>
 {
-  setActivities([...activities,activity]);
-  setSelectedActivity(activity);
-  setEditMode(false);
+  agent.Activities.create(activity).then(()=>
+  {
+    setActivities([...activities,activity]);
+    setSelectedActivity(activity);
+    setEditMode(false);
+  }
+  )
+
 }
 
 const handleEditActivity=(activity: IActivity)=>{
-  setActivities([...activities.filter(a=>a.id !==activity.id),activity])
-  setSelectedActivity(activity);
-  setEditMode(false);
+  agent.Activities.update(activity).then(()=>{
+    setActivities([...activities.filter(a=>a.id !==activity.id),activity])
+    setSelectedActivity(activity);
+    setEditMode(false);
+  })
 }
 
 const handleDeleteActivity=(id:string)=>{
-  setActivities([...activities.filter(a=>a.id!==id)])
+  agent.Activities.delete(id).then(()=>{
+    setActivities([...activities.filter(a=>a.id!==id)])
+  })
 }
   useEffect(() => {//three lifecycle methods in one
-    axios.get<IActivity[]>('http://localhost:5000/api/activities')
+    agent.Activities.list()
     .then((response=>{
       let activities:IActivity[]=[];
-      response.data.forEach(activity => {
+      response.forEach((activity)=> {
         activity.date=activity.date.split('.')[0];//usefull to split and take only the things we want
         activities.push(activity);
       });
-      setActivities(response.data);
+      setActivities(activities);
     }))
   },[]);//called every time render if []
        // change then call it again not again and again
