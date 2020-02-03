@@ -10,7 +10,7 @@ using Persistence;
 
 namespace API
 {
-    public class Startup
+    public class Startup//looks like the coach configure the server what to run
     {
         public Startup(IConfiguration configuration)
         {

@@ -19,8 +19,8 @@ namespace API
                 var services=scope.ServiceProvider;
                 try{
                         var context =services.GetRequiredService<DataContext>();
-                        context.Database.Migrate();
-                        //Seed.SeedData(context);
+                        context.Database.Migrate();//use for migration in sql
+                        Seed.SeedData(context);//seed with data activities table
                 }
                 catch(Exception ex){
                     var logger=services.GetRequiredService<ILogger<Program>>();
@@ -31,7 +31,7 @@ namespace API
             host.Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
+        public static IHostBuilder CreateHostBuilder(string[] args) =>// Like the referee
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
