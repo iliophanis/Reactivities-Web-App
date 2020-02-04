@@ -1,15 +1,18 @@
-import React, { useState, useEffect, Fragment, SyntheticEvent } from "react";
+import React, { useState, useEffect, Fragment, SyntheticEvent, useContext } from "react";
 import { Container } from "semantic-ui-react";
 import { IActivity } from "../models/activity";
 import NavBar from "../../features/navbar/NavBar";
 import ActivityDashboard from "../../features/activities/dashboard/ActivityDashboard";
 import agent from "../api/agent";
 import LoadingComponent from "./LoadingComponent";
+import ActivityStore from '../stores/ActivityStore';
+import {observer} from 'mobx-react-lite';
 
 interface Istate {
   activities: IActivity[]; //type of an array of iactivity
 }
 const App = () => {
+  const activityStore = useContext(ActivityStore);
   const [activities, setActivities] = useState<IActivity[]>([]);
   const [selectedActivity, setSelectedActivity] = useState<IActivity | null>(
     null
@@ -59,27 +62,19 @@ const App = () => {
   };
   useEffect(() => {
     //three lifecycle methods in one
-    agent.Activities.list().then(response => {
-      let activities: IActivity[] = [];
-      response
-        .forEach(activity => {
-          activity.date = activity.date.split(".")[0]; //usefull to split and take only the things we want
-          activities.push(activity);
-        })
-      setActivities(activities);
-    }).then(() => setLoading(false));
-  }, []); //called every time render if []
+    activityStore.loadActivities()
+  }, [activityStore]); //called every time render if []
   // change then call it again not again and again
   // else we will have infinite loop
 
-  if (loading) return <LoadingComponent content='Loading activities...'/>
+  if (activityStore.loadingInitial) return <LoadingComponent content='Loading activities...'/>
   return (
     //use fragment because div create a null div no reason
     <Fragment>
       <NavBar openCreateForm={handleOpenCreateForm} />
       <Container style={{ marginTop: "7em" }}>
         <ActivityDashboard
-          activities={activities}
+          activities={activityStore.activities}
           selectActivity={handleSelectActivity}
           selectedActivity={selectedActivity}
           editMode={editMode}
@@ -96,4 +91,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default observer (App);//must be observer  to work 
