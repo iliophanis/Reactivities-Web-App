@@ -1,23 +1,24 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useContext } from "react";
 import { Segment, Form, Button } from "semantic-ui-react";
 import { IActivity } from "../../../app/models/activity";
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from "uuid";
+import ActivityStore from "../../../app/stores/ActivityStore";
 
 interface IProps {
   setEditMode: (editMode: boolean) => void;
   activity: IActivity;
-  createActivity:(activity: IActivity) => void;
-  editActivity:(activity: IActivity)=>void;
-  submitting:boolean;
+  editActivity: (activity: IActivity) => void;
+  submitting: boolean;
 }
 
 const ActivityForm: React.FC<IProps> = ({
   setEditMode,
   activity: initializeFormState,
-  createActivity,
   editActivity,
   submitting
 }) => {
+  const activityStore = useContext(ActivityStore);
+  const { createActivity } = activityStore;
   const initializeForm = () => {
     if (initializeFormState) {
       return initializeFormState;
@@ -36,15 +37,13 @@ const ActivityForm: React.FC<IProps> = ({
   const [activity, setActivity] = useState<IActivity>(initializeForm);
 
   const handleSubmit = () => {
-    if(activity.id.length===0)
-    {
-      let newActivity={
+    if (activity.id.length === 0) {
+      let newActivity = {
         ...activity,
-        id:uuid()
-      }
+        id: uuid()
+      };
       createActivity(newActivity);
-    }else
-    {
+    } else {
       editActivity(activity);
     }
     console.log(activity);
@@ -83,8 +82,7 @@ const ActivityForm: React.FC<IProps> = ({
         <Form.Input
           onChange={handleInputChange}
           name="date"
-          type="date"//in different case dont show the date PROBLEM WITH DATE type=datetime-local
-          placeholder="Date"
+          type="date" // dont show the datetime-local only date no time PROBLEM
           value={activity.date}
         />
         <Form.Input
@@ -99,7 +97,13 @@ const ActivityForm: React.FC<IProps> = ({
           placeholder="Venue"
           value={activity.venue}
         />
-        <Button loading={submitting} floated="right" positive type="submit" content="Submit" />
+        <Button
+          loading={submitting}
+          floated="right"
+          positive
+          type="submit"
+          content="Submit"
+        />
         <Button
           onClick={() => setEditMode(false)}
           floated="right"
