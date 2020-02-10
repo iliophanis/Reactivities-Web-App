@@ -7,17 +7,32 @@ configure({ enforceActions: "always" });
 
 class ActivityStore {
   @observable activityRegistry = new Map(); //more functionallity make the
-  @observable activity: IActivity | null=null;
+  @observable activity: IActivity | null = null;
   @observable loadingInitial = false;
   @observable submitting = false;
   @observable target = "";
 
   @computed get activitiesByDate() {
-    return Array.from(this.activityRegistry.values()).sort(
-      (a, b) => Date.parse(a.date) - Date.parse(b.date)
+    return this.groupActivitiesByDate(
+      Array.from(this.activityRegistry.values())
     );
   } //derived from the existing state or other computed values.
   //help you to make your actual modifiable state as small as possible
+
+  groupActivitiesByDate(activities: IActivity[]) {
+    const sortedActivities = activities.sort(
+      (a, b) => Date.parse(a.date) - Date.parse(b.date)
+    );
+    return Object.entries(
+      sortedActivities.reduce((activities, activity) => {
+        const date = activity.date.split("T")[0];
+        activities[date] = activities[date]
+          ? [...activities[date], activity]
+          : [activity];
+        return activities;
+      }, {} as { [key: string]: IActivity[] })
+    ); //[key,value] i must set as key the date
+  }
 
   @action loadActivities = async () => {
     //async method instead of remain a promise
@@ -39,35 +54,34 @@ class ActivityStore {
     }
   };
 
-
-  @action loadActivity=async(id:string)=>{
-    let activity =this.getActivity(id);
-    if(activity) {
-      this.activity=activity;
-    }else{
-      this.loadingInitial=true;
-      try{
-        activity=await agent.Activities.details(id);
-        runInAction('getting actiivty',()=>{
-          this.activity=activity;
-          this.loadingInitial=false;
-        })
-      }catch(error){
-        runInAction('get activity error',()=>{
-          this.loadingInitial=false;
-        })
+  @action loadActivity = async (id: string) => {
+    let activity = this.getActivity(id);
+    if (activity) {
+      this.activity = activity;
+    } else {
+      this.loadingInitial = true;
+      try {
+        activity = await agent.Activities.details(id);
+        runInAction("getting actiivty", () => {
+          this.activity = activity;
+          this.loadingInitial = false;
+        });
+      } catch (error) {
+        runInAction("get activity error", () => {
+          this.loadingInitial = false;
+        });
         console.log(error);
       }
     }
-  }
+  };
 
-  @action clearActivity=()=>{
-    this.activity=null;
-  }
+  @action clearActivity = () => {
+    this.activity = null;
+  };
 
-  getActivity=(id:string)=>{
+  getActivity = (id: string) => {
     return this.activityRegistry.get(id);
-  }
+  };
 
   @action editActivity = async (activity: IActivity) => {
     this.submitting = true;
