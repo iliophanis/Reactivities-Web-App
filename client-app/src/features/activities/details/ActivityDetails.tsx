@@ -22,21 +22,25 @@ const ActivityDetails: React.FC<RouteComponentProps<DetailParams>> = ({
 
   useEffect(() => {
     loadActivity(match.params.id);
-  }, [loadActivity, match.params.id]);
+  }, [loadActivity, match.params.id, history]);
 
-  if (loadingInitial || !activity)
-    return <LoadingComponent content="loading activity" />;
+  if (loadingInitial && !activity)
+    return <LoadingComponent content="loading activity..." />;
+
+  if (!activity) {
+    return <h2>Activity not found</h2>;
+  }
+
   return (
     <Grid>
       <Grid.Column width={10}>
         <ActivityDetaliedHeader activity={activity} />
-        <ActivityDetailedInfo activity={activity}/>
+        <ActivityDetailedInfo activity={activity} />
         <ActivityDetailedChat />
       </Grid.Column>
       <Grid.Column width={6}>
-      <ActivityDetailedSidebar />
+        <ActivityDetailedSidebar />
       </Grid.Column>
-        
     </Grid>
   );
 };
