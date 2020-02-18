@@ -12,19 +12,21 @@ namespace API
     {
         public static void Main(string[] args)
         {
-            var host=CreateHostBuilder(args).Build();
-            
-            using(var scope=host.Services.CreateScope())
+            var host = CreateHostBuilder(args).Build();
+
+            using (var scope = host.Services.CreateScope())
             {
-                var services=scope.ServiceProvider;
-                try{
-                        var context =services.GetRequiredService<DataContext>();
-                        context.Database.Migrate();//use for migration in sql
-                        Seed.SeedData(context);//seed with data activities table
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var context = services.GetRequiredService<DataContext>();
+                    context.Database.Migrate();//use for migration in sql
+                                               //Seed.SeedData(context);//seed with data activities table
                 }
-                catch(Exception ex){
-                    var logger=services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex,"An error occured during migration");
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occured during migration");
                 }
             }
             //make a new db reactivites.db
