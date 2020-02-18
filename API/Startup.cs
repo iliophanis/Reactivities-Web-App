@@ -1,9 +1,11 @@
 using API.Middleware;
 using Application.Activities;
+using Domain;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,11 +38,18 @@ namespace API
                  });
             });//to allow header method with front-end set polic CORS
             services.AddMediatR(typeof(List.Handler).Assembly);
-            services.AddControllers()
+            services.AddControllers()// he writes AddMvc check ?
                 .AddFluentValidation(cfg =>
                 {
                     cfg.RegisterValidatorsFromAssemblyContaining<Create>();//look inside project for any validators
                 });
+            //4 steps to make the configuration of identity in entity framework
+            var builder = services.AddIdentityCore<AppUser>();//use to insert the identity from ef
+            var identityBuilder = new IdentityBuilder(builder.UserType, builder.Services);
+            identityBuilder.AddEntityFrameworkStores<DataContext>();
+            identityBuilder.AddSignInManager<SignInManager<AppUser>>();
+
+            services.AddAuthentication();//without this we have problem with Iclock when start the API 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

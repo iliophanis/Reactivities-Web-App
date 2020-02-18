@@ -1,5 +1,7 @@
 using System;
+using Domain;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -20,8 +22,10 @@ namespace API
                 try
                 {
                     var context = services.GetRequiredService<DataContext>();
+                    var userManager = services.GetRequiredService<UserManager<AppUser>>();
                     context.Database.Migrate();//use for migration in sql
-                                               //Seed.SeedData(context);//seed with data activities table
+                    Seed.SeedData(context, userManager).Wait();//seed with data activities table
+                    //insert Wait() because SeedData is async and continue with Wait you are sure not call again(STOP WHEN CALL WAIT)
                 }
                 catch (Exception ex)
                 {
