@@ -10,7 +10,7 @@ import ErrorMessage from "../../app/common/form/ErrorMessage";
 
 const validate = combineValidators({
   email: isRequired("email"),
-  password: isRequired("email")
+  password: isRequired("password")
 });
 
 const LoginForm = () => {
@@ -28,7 +28,6 @@ const LoginForm = () => {
       render={({
         handleSubmit,
         submitting,
-        form,
         submitError,
         invalid,
         pristine,

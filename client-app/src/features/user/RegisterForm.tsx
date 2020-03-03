@@ -12,7 +12,7 @@ const validate = combineValidators({
   username: isRequired("username"),
   displayName: isRequired("display name"),
   email: isRequired("email"),
-  password: isRequired("email")
+  password: isRequired("password")
 });
 
 const RegisterForm = () => {
@@ -26,11 +26,10 @@ const RegisterForm = () => {
           [FORM_ERROR]: error
         }))
       }
-      //validate={validate}
+      validate={validate}
       render={({
         handleSubmit,
         submitting,
-        form,
         submitError,
         invalid,
         pristine,
@@ -63,7 +62,7 @@ const RegisterForm = () => {
             disabled={(invalid && !dirtySinceLastSubmit) || pristine}
             loading={submitting}
             color="teal"
-            content="Login"
+            content="Register"
             fluid
           />
           {/* <pre>{JSON.stringify(form.getState(), null, 2)}</pre> */}
