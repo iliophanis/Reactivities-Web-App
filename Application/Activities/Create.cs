@@ -5,6 +5,8 @@ using Domain;
 using MediatR;
 using Persistence;
 using FluentValidation;
+using Application.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Activities
 {
@@ -38,10 +40,12 @@ namespace Application.Activities
         public class Handler : IRequestHandler<Command>//generate interface
         {
             private readonly DataContext _context;
+            private readonly IUserAccessor _userAccessor;
 
             //constructor _
-            public Handler(DataContext context)
+            public Handler(DataContext context, IUserAccessor userAccessor)
             {
+                _userAccessor = userAccessor;
                 _context = context;
             }
             //async method to create an activity
@@ -59,6 +63,21 @@ namespace Application.Activities
                 };
 
                 _context.Activities.Add(activity);//async putt data in db
+
+
+                var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName ==
+                 _userAccessor.GetCurrentUsername());
+
+                var attendee = new UserActivity
+                {
+                    AppUser = user,
+                    Activity = activity,
+                    isHost = true,
+                    DateJoined = DateTime.Now
+                };
+
+                _context.UserActivities.Add(attendee);
+
                 var success = await _context.SaveChangesAsync() > 0;
                 if (success) return Unit.Value;
 
