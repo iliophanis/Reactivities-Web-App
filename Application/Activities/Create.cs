@@ -64,7 +64,7 @@ namespace Application.Activities
 
                 _context.Activities.Add(activity);//async putt data in db
 
-
+                //create activities per user 
                 var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName ==
                  _userAccessor.GetCurrentUsername());
 
@@ -72,7 +72,7 @@ namespace Application.Activities
                 {
                     AppUser = user,
                     Activity = activity,
-                    isHost = true,
+                    IsHost = true,
                     DateJoined = DateTime.Now
                 };
 
